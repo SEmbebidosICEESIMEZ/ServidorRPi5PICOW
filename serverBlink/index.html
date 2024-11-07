@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    .buttonon {
+      background-color: green;
+      color: #fff;
+      border: none;
+      padding: 20px 50px;
+      margin: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .buttonoff {
+      background-color: red;
+      color: #fff;
+      border: none;
+      padding: 20px 50px;
+      margin: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    #response {
+      margin-top: 15px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <p style="color:blue">Control de luces</p>
+  <button class="buttonon" onclick="sendMessage('on')">Encender</button>
+  <button class="buttonoff" onclick="sendMessage('off')">Apagar</button>
+
+  <p id="response">Presiona un boton.</p>
+
+  <script>
+    const socket = new WebSocket(`ws://${window.location.hostname}:3000`);
+
+    socket.onopen = () => {
+      console.log('Conexiï¿½n WebSocket establecida');
+    };
+
+    socket.onmessage = (event) => {
+      document.getElementById('response').innerText = event.data;
+    };
+
+    socket.onerror = (error) => {
+      console.error('Error de WebSocket:', error);
+    };
+
+    function sendMessage(message) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+      }
+    }
+  </script>
+</body>
+</html>
