@@ -1,7 +1,7 @@
 🌟 Sistema de Comunicación IoT: Raspberry Pi + Pico W
+
 📝 Descripción
 Sistema que demuestra la implementación de comunicación entre una Raspberry Pi (servidor) y una Raspberry Pi Pico W (cliente) a través de diferentes protocolos, ideal para aprendizaje y proyectos IoT.
-
 🚀 Ejemplos Incluidos
 1. 💡 Control LED Básico (Blink)
 Control remoto de LED mediante interfaz web
