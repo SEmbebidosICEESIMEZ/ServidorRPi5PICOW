@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control LED RGB</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+    .color-picker, .slider-container {
+      margin: 20px 0;
+    }
+    .slider {
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Control LED RGB</h1>
+  <input type="color" id="colorPicker" class="color-picker">
+  <div class="slider-container">
+    <input type="range" id="redSlider" class="slider" min="0" max="255" value="0">
+    <label for="redSlider">R: <span id="redValue">0</span></label>
+  </div>
+  <div class="slider-container">
+    <input type="range" id="greenSlider" class="slider" min="0" max="255" value="0">
+    <label for="greenSlider">G: <span id="greenValue">0</span></label>
+  </div>
+  <div class="slider-container">
+    <input type="range" id="blueSlider" class="slider" min="0" max="255" value="0">
+    <label for="blueSlider">B: <span id="blueValue">0</span></label>
+  </div>
+  <div id="rgbValues"></div>
+
+  <script>
+    const socket = new WebSocket(`ws://${window.location.hostname}:3000`);
+    const colorPicker = document.getElementById('colorPicker');
+    const redSlider = document.getElementById('redSlider');
+    const greenSlider = document.getElementById('greenSlider');
+    const blueSlider = document.getElementById('blueSlider');
+    const redValue = document.getElementById('redValue');
+    const greenValue = document.getElementById('greenValue');
+    const blueValue = document.getElementById('blueValue');
+    const rgbValues = document.getElementById('rgbValues');
+
+    socket.onopen = () => {
+      console.log('Conexiï¿½n WebSocket establecida');
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      updateColorPicker(data);
+      updateSliders(data);
+    };
+
+    colorPicker.addEventListener('input', updateFromColorPicker);
+    redSlider.addEventListener('input', updateFromSliders);
+    greenSlider.addEventListener('input', updateFromSliders);
+    blueSlider.addEventListener('input', updateFromSliders);
+
+    function updateFromColorPicker() {
+      const color = colorPicker.value;
+      const rgb = hexToRgb(color);
+      updateSliders(rgb);
+      sendRgbValues(rgb);
+    }
+
+    function updateFromSliders() {
+      const rgb = {
+        r: parseInt(redSlider.value),
+        g: parseInt(greenSlider.value),
+        b: parseInt(blueSlider.value)
+      };
+      updateColorPicker(rgb);
+      sendRgbValues(rgb);
+    }
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return { r, g, b };
+    }
+
+    function updateColorPicker(rgb) {
+      const hex = `#${rgb.r.toString(16).padStart(2, '0')}${rgb.g.toString(16).padStart(2, '0')}${rgb.b.toString(16).padStart(2, '0')}`;
+      colorPicker.value = hex;
+      updateRgbValues(rgb);
+    }
+
+    function updateSliders(rgb) {
+      redSlider.value = rgb.r;
+      greenSlider.value = rgb.g;
+      blueSlider.value = rgb.b;
+      redValue.textContent = rgb.r;
+      greenValue.textContent = rgb.g;
+      blueValue.textContent = rgb.b;
+    }
+
+    function updateRgbValues(rgb) {
+      rgbValues.textContent = `R: ${rgb.r}, G: ${rgb.g}, B: ${rgb.b}`;
+    }
+
+    function sendRgbValues(rgb) {
+      socket.send(JSON.stringify(rgb));
+    }
+  </script>
+</body>
+</html>
