@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conteo de Interrupciones</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    #count {
+      font-size: 2em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Conteo de Interrupciones</h1>
+  <div id="count">0</div> <!-- Mostrar el conteo aquí -->
+
+  <script>
+    const socket = new WebSocket(`ws://${window.location.hostname}:3000`);
+
+    socket.onopen = () => {
+      console.log('Conexión WebSocket establecida');
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      document.getElementById('count').innerText = data.count; // Actualiza el conteo en la página
+    };
+
+    socket.onerror = (error) => {
+      console.error('Error de WebSocket:', error);
+    };
+  </script>
+</body>
+</html>
